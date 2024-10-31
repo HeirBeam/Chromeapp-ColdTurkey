@@ -1,0 +1,76 @@
+/* Basic Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    padding: 15px;
+    width: 280px;
+    background-color: #f4f6f9;
+    color: #333;
+  }
+  
+  /* Header Styling */
+  h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #007acc;
+    text-align: center;
+  }
+  
+  /* Input Group Styling */
+  .input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    background-color: #fff;
+    border-radius: 6px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 8px;
+  }
+  
+  .input-group label {
+    width: 70px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 6px;
+    margin-left: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  /* Start Button Styling */
+  #start {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007acc;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+  }
+  
+  #start:hover {
+    background-color: #005b9f;
+  }
+  
+  /* Status Messages Styling */
+  #status, #countdown {
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+  }
+  
+  /* Countdown Styling */
+  #countdown {
+    font-weight: bold;
+    color: #d9534f;
+  }
+  
