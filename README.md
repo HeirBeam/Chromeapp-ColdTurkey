@@ -1,6 +1,7 @@
 
 # Tab Auto Closer Chrome Extension
 
+I had been spending too much time on youtube so I decided to create and extension to put a time limit on the time I spend on youtube.
 Automatically close tabs from specified websites after a set period. This extension allows you to add websites and a time limit so that tabs from those sites will close automatically each time they’re opened.
 
 ### Features
