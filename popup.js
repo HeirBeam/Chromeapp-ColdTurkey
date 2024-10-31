@@ -7,37 +7,74 @@ document.getElementById("start").addEventListener("click", () => {
     if (website && totalSeconds > 0) {
       const delay = totalSeconds * 1000; // Convert to milliseconds
   
-      // Store the delay time and website
-      chrome.storage.local.set({ timeLimit: delay, targetWebsite: website, startTime: Date.now() }, () => {
-        document.getElementById("status").innerText = `Tabs from ${website} will close in ${minutes} minute(s) and ${seconds} second(s).`;
-        document.getElementById("countdown").innerText = `Time left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        chrome.runtime.sendMessage({ action: "startTimer" });
+      chrome.storage.local.get({ trackedWebsites: [] }, (data) => {
+        const trackedWebsites = data.trackedWebsites;
   
-        // Start countdown display
-        startCountdown(delay);
+        // Add or update the website and timer in the list
+        const existingIndex = trackedWebsites.findIndex(item => item.website === website);
+        if (existingIndex > -1) {
+          trackedWebsites[existingIndex].timeLimit = delay; // Update time limit if site is already in list
+        } else {
+          trackedWebsites.push({ website, timeLimit: delay });
+        }
+  
+        // Save the updated list back to storage
+        chrome.storage.local.set({ trackedWebsites }, () => {
+          document.getElementById("status").innerText = `Tabs from ${website} will close after ${minutes} minute(s) and ${seconds} second(s).`;
+          displayTrackedWebsites(); // Update the list display
+          chrome.runtime.sendMessage({ action: "updateSettings" });
+        });
       });
     } else {
       document.getElementById("status").innerText = "Please enter a valid website and time.";
     }
   });
   
-  // Countdown display function
-  function startCountdown(delay) {
-    const countdownElement = document.getElementById("countdown");
-    const interval = setInterval(() => {
-      chrome.storage.local.get(["startTime", "timeLimit"], (data) => {
-        const elapsed = Date.now() - data.startTime;
-        const timeLeft = Math.max(data.timeLimit - elapsed, 0);
+  // Display tracked websites in the popup
+  function displayTrackedWebsites() {
+    const websiteList = document.getElementById("website-list");
+    websiteList.innerHTML = ""; // Clear current list
   
-        const minutesLeft = Math.floor(timeLeft / 60000);
-        const secondsLeft = Math.floor((timeLeft % 60000) / 1000);
-        countdownElement.innerText = `Time left: ${minutesLeft}:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
+    chrome.storage.local.get({ trackedWebsites: [] }, (data) => {
+      data.trackedWebsites.forEach((item, index) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${item.website} - ${item.timeLimit / 1000} seconds`;
   
-        if (timeLeft <= 0) {
-          clearInterval(interval); // Stop the countdown when time runs out
-          countdownElement.innerText = "Time's up!";
-        }
+        // Remove button for each website
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "Remove";
+        removeButton.addEventListener("click", () => removeTrackedWebsite(index));
+  
+        listItem.appendChild(removeButton);
+        websiteList.appendChild(listItem);
       });
-    }, 1000);
+    });
   }
+  
+  // Remove a specific website from tracked list
+  function removeTrackedWebsite(index) {
+    chrome.storage.local.get({ trackedWebsites: [] }, (data) => {
+      const trackedWebsites = data.trackedWebsites;
+      trackedWebsites.splice(index, 1); // Remove the selected website
+  
+      chrome.storage.local.set({ trackedWebsites }, () => {
+        displayTrackedWebsites(); // Update the list display
+        chrome.runtime.sendMessage({ action: "updateSettings" });
+      });
+    });
+  }
+  
+  // Clear all tracked websites
+  document.getElementById("clearAll").addEventListener("click", () => {
+    chrome.storage.local.set({ trackedWebsites: [] }, () => {
+      displayTrackedWebsites();
+      chrome.runtime.sendMessage({ action: "updateSettings" });
+      document.getElementById("status").innerText = "All tracked websites have been cleared.";
+    });
+  });
+  
+  // Initialize the display of tracked websites on popup load
+  document.addEventListener("DOMContentLoaded", () => {
+    displayTrackedWebsites();
+  });
   
